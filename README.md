@@ -23,4 +23,4 @@
 `GET message`
 - Finds the value of the key message
 
-## Take the reference of [Strings](strings.md) for the String related commands.
+## Take the reference of [Strings](strings/strings.md) for the String related commands.
