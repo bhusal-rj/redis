@@ -3,6 +3,8 @@
 - Redis is extremely fast because all data is stored in memory.
 - Redis organizes all of its data in simple data structures.
 - Redis is extremely simple.
+- Redis processes are synchronous in nature.
+
 
 # What are Commands?
 ### Redis supports different command to query or insert the data within the memory. Redis supports following data types,

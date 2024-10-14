@@ -18,3 +18,7 @@
 ### `SET age 20`
 - Redis stores the number as the string inside it
 - When performing above operation if number **Redis** performs the operation else throws an index out of range
+
+
+### Why are these commands even useful?
+- Working with the number becomes ideal as multiple trip to redis is not required to perform arithematic opeartions within the data.
