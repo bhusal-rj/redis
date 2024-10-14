@@ -6,6 +6,26 @@
 - Redis processes are synchronous in nature.
 
 
+## Redis Design Methodlogy
+1. Figure out what queries we need to answer.
+2. Structure data to best answer those queries.
+- Opposite methodology as compared to the SQL.
+
+## Design Consideration
+- What Kind of data are we storing?                
+- Should we be concerned about the size of data?   
+- Do we need to expire the data
+- Key name policies
+- Any business logic concerns
+
+## Key Naming
+- Keys should be unique.
+- Other engineer must understand about the goal of the key.
+- Extremely common practise to use a ':' to separates the different parts of the key. Eg,  `users:posts:91` - **Posts associated with user id 91**
+- Now a days using # for unique identifier is prefered; `users:posts#91`
+
+
+
 # What are Commands?
 ### Redis supports different command to query or insert the data within the memory. Redis supports following data types,
 - String
