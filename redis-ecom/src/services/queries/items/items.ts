@@ -15,8 +15,19 @@ export const getItem = async (id: string) => {
 
 export const getItems = async (ids: string[]) => {
   //get all items from the redis
-  
-  
+  //one approach will be to use loop and do hGetAll
+  //it takes some amount of time
+
+
+  //another approach will be to use the pipeline
+  //donot use await inside the promise.all
+  const results = await Promise.all(ids.map(id=>client.hGetAll(itemsKey(id))))  
+  return results.map((result,idx)=>{
+    if (Object.keys(result).length == 0){
+      return null
+    }
+    return deserialize(ids[idx],result)
+  })
 };
 
 

@@ -25,6 +25,15 @@
 - Now a days using # for unique identifier is prefered; `users:posts#91`
 
 
+## Pipelining
+- When we need to query redis to execute or perform multiple actions it causes the certain delay.
+`Client --> Server process --> Response --> Client`
+- Suppose we need to query the redis to **GET** all the items within the product has having the key of the items of size 1000.
+- One scenario would be to use the loopover all the 1000 ids and call `HGETALL` to fetch the relevant data but it introduces certain delay so instead of sending
+the command one by one we can batch out with the help of pipelining.
+- `await Promise.all(id=>client.HGETALL(id))` can be used in node-redis
+
+
 
 # What are Commands?
 ### Redis supports different command to query or insert the data within the memory. Redis supports following data types,
