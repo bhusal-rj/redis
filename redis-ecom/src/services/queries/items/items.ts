@@ -1,4 +1,4 @@
-import { itemsKey } from '$services/keys';
+import { itemsKey, itemsByViewsKey, itemsByEndingAtKey } from '$services/keys';
 import { client } from '$services/redis';
 import type { CreateItemAttrs } from '$services/types';
 import { genId } from '$services/utils';
@@ -7,10 +7,10 @@ import { serialize } from './serialize';
 
 export const getItem = async (id: string) => {
   const item = await client.hGetAll(itemsKey(id))
-  if (Object.keys(item).length == 0 ){
+  if (Object.keys(item).length == 0) {
     return null;
   }
-  return deserialize(id,item)
+  return deserialize(id, item)
 };
 
 export const getItems = async (ids: string[]) => {
@@ -21,20 +21,32 @@ export const getItems = async (ids: string[]) => {
 
   //another approach will be to use the pipeline
   //donot use await inside the promise.all
-  const results = await Promise.all(ids.map(id=>client.hGetAll(itemsKey(id))))  
-  return results.map((result,idx)=>{
-    if (Object.keys(result).length == 0){
+  const results = await Promise.all(ids.map(id => client.hGetAll(itemsKey(id))))
+  return results.map((result, idx) => {
+    if (Object.keys(result).length == 0) {
       return null
     }
-    return deserialize(ids[idx],result)
+    return deserialize(ids[idx], result)
   })
 };
 
 
 export const createItem = async (attrs: CreateItemAttrs, userId: string) => {
   //store dates in the form of unix milliseconds
-  const itemId=genId();
-  await client.hSet(itemsKey(itemId),serialize(attrs))
+  const itemId = genId();
+
+  await Promise.all([
+  //whenever the new item is created initialize it's views to be zero
+    client.zAdd(itemsByViewsKey(), {
+      value: itemId,
+      score: 0
+    }),
+    client.hSet(itemsKey(itemId), serialize(attrs)),
+    client.zAdd(itemsByEndingAtKey(),{
+      value:itemId,
+      score:attrs.endingAt.toMillis()
+    })
+  ])
   return itemId;
 };
 
