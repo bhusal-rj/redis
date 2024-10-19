@@ -14,5 +14,6 @@ export const itemsByEndingTime = async (
 			count
 		}
 	})
+	//pipelining hgetall for all the items
 	return getItems(ids)
 };
