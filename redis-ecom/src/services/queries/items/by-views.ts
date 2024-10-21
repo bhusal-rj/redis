@@ -21,5 +21,6 @@ export const itemsByViews = async (order: 'DESC' | 'ASC' = 'DESC', offset = 0, c
     items.push(item)
     results=rest
   }
+  return items
   
 };
