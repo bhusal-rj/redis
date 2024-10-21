@@ -1,11 +1,54 @@
-import { createClient } from 'redis';
+import { createClient,defineScript } from 'redis';
+import { itemsByViewsKey, itemsKey, itemsViewsKey } from "$services/keys";
 
 const client = createClient({
 	socket: {
 		host: process.env.REDIS_HOST,
 		port: parseInt(process.env.REDIS_PORT)
 	},
-	password: process.env.REDIS_PW
+	password: process.env.REDIS_PW,
+
+	scripts: {
+		addOneAndStore: defineScript({
+			NUMBER_OF_KEYS: 1,
+			SCRIPT: `
+				return redis.call("SET",KEYS[1],1+tonumber(ARGV[1]))
+			`,
+			//passing the argument to EVAL SHA
+			transformArguments(value: number, key: string) {
+				return [key, value.toString()]
+			},
+			//how to return value from script to the program
+			transformReply(reply) {
+				return reply
+			}
+
+		}),
+
+		incrementView: defineScript({
+			NUMBER_OF_KEYS: 3,
+			SCRIPT: `
+				local itemsViewsKey = KEYS[1]
+				local itemsKey = KEYS[2]
+				local itemsByViewsKey = KEYS[3]
+				local itemId = ARGV[1]
+				local userId = ARGV[2]
+
+				local inserted=redis.call("PFADD",itemsViewsKey,userId)
+				if inserted == 1 then
+					redis.call("HINCRBY",itemsKey,'views',1)
+					redis.call("ZINCRBY",itemsByViewsKey,1,itemId)
+				end
+				
+			`,
+			transformArguments(itemId: string, userId: string) {
+				return [itemsViewsKey(itemId), itemsKey(itemId), itemsByViewsKey(), itemId, userId]
+			},
+			transformReply(reply, preserved) {
+				return reply
+			},
+		})
+	}
 });
 
 client.on('error', (err) => console.error(err));

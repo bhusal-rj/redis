@@ -10,7 +10,9 @@ export const getItem = async (id: string) => {
   if (Object.keys(item).length == 0) {
     return null;
   }
-  return deserialize(id, item)
+
+  const deserialized=deserialize(id, item)
+  return deserialized
 };
 
 export const getItems = async (ids: string[]) => {
@@ -22,6 +24,7 @@ export const getItems = async (ids: string[]) => {
   //another approach will be to use the pipeline
   //donot use await inside the promise.all
   const results = await Promise.all(ids.map(id => client.hGetAll(itemsKey(id))))
+
   return results.map((result, idx) => {
     if (Object.keys(result).length == 0) {
       return null

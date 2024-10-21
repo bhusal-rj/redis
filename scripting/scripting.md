@@ -12,13 +12,18 @@
 - Loss of language feature like type checking in TS.
 - Another language to deal with LUA.
 
+## Design Pattern
+- Identify all key and arguments you want to access.
+- Assign keys and arguments to well labelled variables.
+- Write logic and donot forget to return a value if needed.
+
 **Server** ---> Write the script ----> Load the script with `SCRIPT LOAD 'script'` command ----> Redis stores the script so can be ran in future then sends back the script id
 **Script id** ---> Hold onto script id
 
 - Once the script is loaded we can execute the script with `EVALSHA ID`. Redis runs the script,gets the return value and send value back to server.
 
-`SCRIPT LOAD 'return 1+1'` -- Returns back the id
-`EVALSHA <ID> 0`             -- Provides the result
+`SCRIPT LOAD 'return 1+1'` --       Returns back the id
+`EVALSHA <ID> 0`           --       Provides the result
 
 - LUA script also accepts the arguments to get argument we can use ARGV[1]. Argv is global variable and should be provided as string.
 - `SCRIPT LOAD 'return 1 + tonumber(ARGV[1])'`

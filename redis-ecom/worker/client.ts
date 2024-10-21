@@ -1,4 +1,5 @@
-import { createClient } from 'redis';
+import { createClient,defineScript } from 'redis';
+
 
 const client = createClient({
 	socket: {
@@ -6,6 +7,7 @@ const client = createClient({
 		port: parseInt(process.env.REDIS_PORT)
 	},
 	password: process.env.REDIS_PW
+	
 });
 
 client.on('error', (err) => console.log(err));
