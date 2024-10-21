@@ -3,6 +3,14 @@
 - Implemented as doubly linked list.
 - Often used for time series data.
 
+## List Use Cases
+- Append only or prepend only.
+- No data has sort order besides the order it was inserted.
+
+## When not to use
+- Need to some filtering criteria.
+- Data sorted by some attributes.
+
 
 ## List Commands
 - LPUSH          -   "Push the item to a list from left side"
@@ -17,5 +25,9 @@
 
 - LPOP           -   "Removea and return some numbers from the left side. If no number remove first"
 - RPOP           -   "Remove and return last number from the right side"
-- LSET           -  "Change the value of specific index. `LSET key 0 26` Change the first value to 26"
+- LSET           -   "Change the value of specific index. `LSET key 0 26` Change the first value to 26"
 - LTRIM          -   "Remove all elements outside of this range. `LTRIM key start end`. Removes all items except values from start to end"
+- LINSERT        -   "Inserts the element at the position before or after the any element"
+- LREM           -   "Removes some element from list `LREM key number_of_instance_to_remove value`"
+`LREM key -2 25`"Remove 2 instance of 25 moving from right to left"
+`- indicates right to left and + indicates left to right and 0 means remove all copies`
