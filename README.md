@@ -24,6 +24,8 @@
 - Extremely common practise to use a ':' to separates the different parts of the key. Eg,  `users:posts:91` - **Posts associated with user id 91**
 - Now a days using # for unique identifier is prefered; `users:posts#91`
 
+## Handling Concurrency
+
 
 ## Pipelining
 - When we need to query redis to execute or perform multiple actions it causes the certain delay.
