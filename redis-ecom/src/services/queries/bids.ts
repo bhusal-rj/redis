@@ -1,5 +1,5 @@
 import { bidHistoryKey, itemsByPriceKey, itemsKey } from '$services/keys';
-import { client } from '$services/redis';
+import { client, withLock } from '$services/redis';
 import type { CreateBidAttrs, Bid } from '$services/types';
 import { DateTime } from 'luxon';
 import { getItem } from './items';
@@ -8,6 +8,37 @@ export const createBid = async (attrs: CreateBidAttrs) => {
 	//better to use the sorted set in place of lists.
 	//check if the item exist
 	//solve the concurrency issue as handling multiple bids at same time generates race around condition
+
+	//using the locking mechanism in Redis
+	return withLock(attrs.itemId, async () => {
+		const item = await getItem(attrs.itemId)
+		if (!item) {
+			throw new Error("Item doesnot exist")
+		}
+
+		if (item.price >= attrs.amount) {
+			throw new Error("Bid too low")
+		}
+
+		if (item.endingAt.diff(DateTime.now()).toMillis() < 0) {
+			throw new Error("Item close for bidding")
+
+		}
+		const { amount, createdAt } = attrs
+
+		return Promise.all([
+			client.rPush(bidHistoryKey(attrs.itemId), serializeBid(amount, createdAt.toMillis())),
+			client.hSet(itemsKey(item.id), {
+				bids: item.bids + 1,
+				price: attrs.amount,
+				highestBidUserId: attrs.userId
+			}),
+			client.zAdd(itemsByPriceKey(), {
+				value: item.id,
+				score: attrs.amount
+			})
+		])
+	})
 
 	//for transaction create the new connection
 	//this connection will only be used for transaction
@@ -34,13 +65,13 @@ export const createBid = async (attrs: CreateBidAttrs) => {
 				price: attrs.amount,
 				highestBidUserId: attrs.userId
 			})
-			.zAdd(itemsByPriceKey(),{
-				value:item.id,
-				score:attrs.amount
+			.zAdd(itemsByPriceKey(), {
+				value: item.id,
+				score: attrs.amount
 			})
 			.exec()
-		
-		
+
+
 	})
 
 };

@@ -9,7 +9,10 @@
 - Similar to pieplining, but with big difference.
 - Transaction cannot be undone or rolled back.
 - With transaction the commands get executed one after another. 
-- 
+
+
+## Issue with Watch Command
+- More number of commands will be failed.
 
 ```
   MULTI - Start a new transaction

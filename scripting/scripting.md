@@ -1,5 +1,6 @@
 # Redis Scripting
 - We can write the LUA script as a part of scripting and redis runs LUA script and provides the result.
+- While running the script lua will not process any other commands of Redis
 
 ## When to use Script
 - Limiting the amount of data exchanged between server and redis.
