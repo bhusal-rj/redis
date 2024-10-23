@@ -1,5 +1,7 @@
 # Redisearch
 - In Core Redis data structure we cannot directly use the filtering criteria like searching with conditions.
+- RediSearch can sort search result.
+- Sorting can be done by one field at a time in Redisearch.
 
 ### Create an index. (FT.CREATE)
 - Find all the keys that start with items#.
@@ -15,6 +17,7 @@
 - Creating the index that already exist throws an error so we must be really careful while creating the index.
 - So the best approach will be to create the index when the app first connects to redis.
 - Get the list of all different indexes that exist within the redis and if it doesnot exist than add the index.
+- To get the list of indexes we can use `FT._LIST` and returns an array of indexes
   
 ### Run a query. (FT.SEARCH)
 - Use the index find items with a particular name color and price
@@ -72,4 +75,11 @@ Car between year 1950 and 1970
 - We can go upto three character mismatch.
 - FT.SEARCH idx:cars '@name:(%car%)' - Handle 1 character mismatch.
 - We can add upto 3 % to include 3 character mismatch.
-- We can use `@name:(ra*)` there must be atleast two characters before * sign
+- We can use `@name:(ra*)` there must be atleast two characters before * sign.
+- Fuzzy search uses an algorithm called TF-IDF which is weight based algorithm.
+- We can apply manual weights to the other words to give it more weight.
+- `@name:(chair) => {$weight: 5.0} @description:(chair)` --> provide the weight of chair in a name and weight of 1 to a chair in description. 
+
+
+`FT.PROFILE` gives performance profile of query.
+

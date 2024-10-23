@@ -1,5 +1,6 @@
-import { createClient,defineScript } from 'redis';
+import { createClient, defineScript } from 'redis';
 import { itemsByViewsKey, itemsKey, itemsViewsKey } from "$services/keys";
+import { createIndexes } from './create-indexes';
 
 const client = createClient({
 	socket: {
@@ -9,21 +10,21 @@ const client = createClient({
 	password: process.env.REDIS_PW,
 
 	scripts: {
-		unlock:defineScript({
-			NUMBER_OF_KEYS:1,
-			SCRIPT:`
+		unlock: defineScript({
+			NUMBER_OF_KEYS: 1,
+			SCRIPT: `
 				local key=KEYS[1]
 				local token=ARGV[1]
 				if redis.call('GET',key) == token do
 						return redis.call('DEL',key)
 				end
 			`,
-			transformArguments(key:string,token:string){
-				return [key,token]
+			transformArguments(key: string, token: string) {
+				return [key, token]
 			},
 			transformReply(reply, preserved) {
-          return reply
-      },
+				return reply
+			},
 		}),
 		addOneAndStore: defineScript({
 			NUMBER_OF_KEYS: 1,
@@ -69,5 +70,13 @@ const client = createClient({
 
 client.on('error', (err) => console.error(err));
 client.connect();
+client.on('connect', async () => {
+	try {
+		await createIndexes()
+	} catch (err) {
+		console.log(err)
+
+	}
+})
 
 export { client };
